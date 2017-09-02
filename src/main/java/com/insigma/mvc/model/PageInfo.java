@@ -9,7 +9,15 @@ public class PageInfo implements java.io.Serializable {
 	//private Integer curpage =1;
 	private Integer limit=10;
 	private Integer offset=0;
+	private String appkey;
 	
+	
+	public String getAppkey() {
+		return appkey;
+	}
+	public void setAppkey(String appkey) {
+		this.appkey = appkey;
+	}
 	public Integer getLimit() {
 		return limit;
 	}

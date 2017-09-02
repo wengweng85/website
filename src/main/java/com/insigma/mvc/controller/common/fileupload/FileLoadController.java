@@ -33,7 +33,6 @@ import com.insigma.json.JsonParseUtil;
 import com.insigma.mvc.MvcHelper;
 import com.insigma.mvc.controller.common.suggest.SuggestSearchController;
 import com.insigma.mvc.model.CodeValue;
-import com.insigma.mvc.model.DemoAc01;
 import com.insigma.mvc.model.SFileRecord;
 import com.insigma.resolver.AppException;
 
@@ -267,7 +266,7 @@ public class FileLoadController extends MvcHelper<SFileRecord> {
     public void download(@PathVariable(value="bus_uuid") String bus_uuid, HttpServletRequest request ,HttpServletResponse response) throws  AppException{
         try{
         	String url=API_BASE_URL+URL+"/getFileInfo/"+bus_uuid;
-    		JSONObject jsonobject= HttpRequestUtils.httpGet(url);
+    		JSONObject jsonobject= HttpRequestUtils.httpGetReturnObject(url);
     		SFileRecord filerecord=(SFileRecord)JSONObject.toBean(jsonobject, SFileRecord.class);
     		
         	if(filerecord!=null){

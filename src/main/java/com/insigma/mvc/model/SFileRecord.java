@@ -7,7 +7,7 @@ import java.util.Date;
  *  文件记录表
  * 
  */
-public class SFileRecord extends PageInfo implements java.io.Serializable  {
+public class SFileRecord  extends PageInfo implements java.io.Serializable  {
 	/**
 	 * 
 	 */

@@ -1,11 +1,12 @@
 package com.insigma.mvc.controller.sysmanager.userrole;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import net.sf.json.JSONObject;
 
 import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,14 +63,13 @@ public class SysUserRoleController extends MvcHelper {
 	@RequestMapping("/treedata")
 	@RequiresRoles("admin")
 	@ResponseBody
-	public  String  getGroupTreeData(HttpServletRequest request,Model model) throws Exception {
+	public  List<SGroup>  getGroupTreeData(HttpServletRequest request,Model model) throws Exception {
 		String parentid=request.getParameter("id");
 		if(parentid.equals("")){
 			parentid="G001";
 		}
-		JSONObject jsonParam=JSONObject.fromObject(parentid);
-		String url=API_BASE_URL+URL+"/treedata/";
-		return HttpRequestUtils.httpPost(url,jsonParam).toString();
+		String url=API_BASE_URL+URL+"/treedata/"+parentid;
+		return (List<SGroup>)HttpRequestUtils.httpGetReturnList(url,SGroup.class);
 	}
 	
 	

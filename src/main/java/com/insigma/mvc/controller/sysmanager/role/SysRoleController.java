@@ -1,5 +1,7 @@
 package com.insigma.mvc.controller.sysmanager.role;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -7,7 +9,6 @@ import javax.validation.Valid;
 import net.sf.json.JSONObject;
 
 import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -66,7 +67,7 @@ public class SysRoleController extends MvcHelper<SRole>  {
 	public String querylist(HttpServletRequest request,Model model,SRole srole) throws Exception {
 		JSONObject jsonParam=JSONObject.fromObject(srole);
 		String url=API_BASE_URL+URL+"/querylist/";
-		return HttpRequestUtils.httpPost(url,jsonParam).toString();
+		return  HttpRequestUtils.httpPostReturnObject(url, jsonParam).toString();
 	}
 	
 	
@@ -93,7 +94,7 @@ public class SysRoleController extends MvcHelper<SRole>  {
 	public ModelAndView toRoleEdit(HttpServletRequest request,@PathVariable String id) throws Exception {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/role/sysRoleEdit");
 		String url=API_BASE_URL+URL+"/toRoleEdit/"+id;
-		JSONObject jsonresult= HttpRequestUtils.httpGet(url);
+		JSONObject jsonresult= HttpRequestUtils.httpGetReturnObject(url);
 		modelAndView.addObject("srole",JSONObject.toBean(jsonresult, SRole.class));  
         return modelAndView;
 	}
@@ -136,11 +137,10 @@ public class SysRoleController extends MvcHelper<SRole>  {
 	@RequestMapping("/treedata")
 	@RequiresRoles("admin")
 	@ResponseBody
-	public  String  treedata(HttpServletRequest request, HttpServletResponse response,Model model) throws Exception {
+	public  List<SRole>  treedata(HttpServletRequest request, HttpServletResponse response,Model model) throws Exception {
 		String id=request.getParameter("id");
-		JSONObject jsonParam=JSONObject.fromObject(id);
-		String url=API_BASE_URL+URL+"/treedata";
-		return HttpRequestUtils.httpPost(url,jsonParam).toString();
+		String url=API_BASE_URL+URL+"/treedata/"+id;
+		return (List<SRole>)HttpRequestUtils.httpGetReturnList(url,SRole.class);
 	}
 	
 	

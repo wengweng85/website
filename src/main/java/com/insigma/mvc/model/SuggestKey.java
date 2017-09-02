@@ -1,7 +1,7 @@
 package com.insigma.mvc.model;
 
 
-public class SuggestKey implements java.io.Serializable {
+public class SuggestKey extends PageInfo  implements java.io.Serializable {
 	private String key;
     private String keyword;
 	private String keytype;

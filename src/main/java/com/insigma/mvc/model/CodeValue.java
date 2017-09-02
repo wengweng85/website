@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 
-public class CodeValue implements java.io.Serializable{
+public class CodeValue extends PageInfo  implements java.io.Serializable{
 	
 	/**
 	 * serialVersionUID

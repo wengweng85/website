@@ -67,7 +67,7 @@ public class SysPermController extends MvcHelper<SPermission> {
 	@ResponseBody
 	public List<SPermission>  treedata(HttpServletRequest request, HttpServletResponse response,Model model) throws Exception {
 		String url=API_BASE_URL+URL+"/treedata";
-		return JSONArray.toList(HttpRequestUtils.httpGet(url).getJSONArray("obj"),SPermission.class);
+		return JSONArray.toList(HttpRequestUtils.httpGetReturnArray(url),SPermission.class);
 	}
 	
 	
@@ -81,7 +81,7 @@ public class SysPermController extends MvcHelper<SPermission> {
 	@ResponseBody
 	public String  getPermDataByid(HttpServletRequest request, HttpServletResponse response,Model model,@PathVariable String id) throws Exception {
 		String url=API_BASE_URL+URL+"/getPermData/"+id;
-		return HttpRequestUtils.httpGet(url).getJSONObject("obj").toString();
+		return HttpRequestUtils.httpGet(url).toString();
 	}
 	
 	

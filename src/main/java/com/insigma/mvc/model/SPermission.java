@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
  *  È¨ÏÞ±í
  * 
  */
-public class SPermission implements java.io.Serializable {
+public class SPermission extends PageInfo  implements java.io.Serializable {
 	/**
 	 * 
 	 */

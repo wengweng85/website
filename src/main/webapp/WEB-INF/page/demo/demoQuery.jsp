@@ -185,6 +185,7 @@
    		layer.confirm('确定删除要此用户数据吗？', function(index){
    			var url= "<c:url value='/demo/deletebyid/'/>"+aac001;
    			rc.ajax(url, null,function (response) {
+   				console.log(response);
    				if(response.success){
    					$('#ac01table').refreshtable();
    				}else{

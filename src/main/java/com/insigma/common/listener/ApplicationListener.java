@@ -43,8 +43,6 @@ public class ApplicationListener implements   ServletContextListener  {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		//通过MyApplicationContextUtil获取bean
-		//SysCodeTypeService sysCodeTypeService= MyApplicationContextUtil.getContext().getBean(SysCodeTypeService.class);
 		//是否同步标志 如果上一次同步时间是1小时之内，不同步下载代码
 		boolean syn_flag=true;
 		Element element=EhCacheUtil.getManager().getCache("webcache").get("code_value_last_update_time");
@@ -59,15 +57,15 @@ public class ApplicationListener implements   ServletContextListener  {
 		if(syn_flag){
 			String url=API_BASE_URL+"/codetype/getInitcodetypeList";
 			try{
-					JSONObject jsonobject=HttpRequestUtils.httpGet(url);
+					JSONArray jsonarray=HttpRequestUtils.httpGetReturnArray(url);
 					//返回jsonobject并转换成相应对象
-					List <CodeType> list_code_type= JSONArray.toList (jsonobject.getJSONArray("obj"),CodeType.class);  
+					List <CodeType> list_code_type= JSONArray.toList (jsonarray,CodeType.class);  
 					//code_type code_value同步
 					for(CodeType codetype : list_code_type){
 						String code_type=codetype.getCode_type();
 						url=API_BASE_URL+"/codetype/getInitCodeValueList/"+code_type;
-						jsonobject=HttpRequestUtils.httpGet(url);
-						List<CodeValue> list_code_value  =JSONArray.toList(jsonobject.getJSONArray("obj"),CodeValue.class);
+						jsonarray=HttpRequestUtils.httpGetReturnArray(url);
+						List<CodeValue> list_code_value  =JSONArray.toList(jsonarray,CodeValue.class);
 						if (list_code_value.size() > 0) {
 							//将代码参加加载到redis缓存中
 								//将代码参加加载到ehcache缓存中

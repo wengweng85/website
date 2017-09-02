@@ -50,8 +50,8 @@ public class MyShiroRealm extends AuthorizingRealm {
 		try {
 			// 调用接口
 			String url = API_BASE_URL + "/getUserAndGroupInfo/"+ token.getUsername();
-			JSONObject jsonobject = HttpRequestUtils.httpGet(url);
-			SUser suser = (SUser) JSONObject.toBean(jsonobject.getJSONObject("obj"), SUser.class);
+			JSONObject jsonobject = HttpRequestUtils.httpGetReturnObject(url);
+			SUser suser = (SUser) JSONObject.toBean(jsonobject, SUser.class);
 	
 			if (suser == null) {
 				throw new UnknownAccountException();// 没找到帐号
@@ -67,8 +67,8 @@ public class MyShiroRealm extends AuthorizingRealm {
 			// 用户权限
 			
 			url = API_BASE_URL + "/findPermissionStr/" + token.getUsername();
-			 jsonobject = HttpRequestUtils.httpGet(url);
-			List<SPermission> permlist = JSONArray.toList(jsonobject.getJSONArray("obj"),SPermission.class);
+			JSONArray jsonarray = HttpRequestUtils.httpGetReturnArray(url);
+			List<SPermission> permlist = JSONArray.toList(jsonarray,SPermission.class);
 			EhCacheUtil
 					.getManager()
 					.getCache("webcache")
@@ -94,8 +94,8 @@ public class MyShiroRealm extends AuthorizingRealm {
 				// 用户角色
 
 				String url = API_BASE_URL + "/findRolesStr/" + loginname;
-				JSONObject jsonobject = HttpRequestUtils.httpGet(url);
-				List<SRole> rolelist = JSONArray.toList(jsonobject.getJSONArray("obj"),SRole.class);
+				JSONArray jsonarray = HttpRequestUtils.httpGetReturnArray(url);
+				List<SRole> rolelist = JSONArray.toList(jsonarray,SRole.class);
 				if (rolelist != null) {
 					Set<String> roleset = new HashSet<String>();
 					Iterator iterator_role = rolelist.iterator();
@@ -108,8 +108,8 @@ public class MyShiroRealm extends AuthorizingRealm {
 
 				// 用户权限
 				url = API_BASE_URL + "/findPermissionStr/" + loginname;
-				 jsonobject = HttpRequestUtils.httpGet(url);
-				List<SPermission> permlist = JSONArray.toList(jsonobject.getJSONArray("obj"),SPermission.class);
+				jsonarray = HttpRequestUtils.httpGetReturnArray(url);
+				List<SPermission> permlist = JSONArray.toList(jsonarray,SPermission.class);
 
 				EhCacheUtil
 						.getManager()

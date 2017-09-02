@@ -25,8 +25,5 @@ public class JsonParseUtil<T> {
 		JSONObject jsonParam=JSONObject.fromObject(t,jsonConfig);
 		return jsonParam;
 	}
-	
-	
-	
 
 }

@@ -6,7 +6,7 @@ package com.insigma.mvc.model;
  *  ”√ªß±Ì
  * 
  */
-public class SUser implements java.io.Serializable {
+public class SUser extends PageInfo  implements java.io.Serializable {
 	/**
 	 * 
 	 */

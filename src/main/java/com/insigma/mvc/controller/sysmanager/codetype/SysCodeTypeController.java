@@ -1,5 +1,7 @@
 package com.insigma.mvc.controller.sysmanager.codetype;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -8,7 +10,6 @@ import net.sf.json.JSONObject;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresRoles;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -72,7 +73,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	 */
 	@RequestMapping(value = "/treedata/{code_type}")
 	@ResponseBody
-	public String treedata(HttpServletRequest request, HttpServletResponse response,@PathVariable String code_type) throws AppException {
+	public List<CodeValue> treedata(HttpServletRequest request, HttpServletResponse response,@PathVariable String code_type) throws AppException {
 		String id=request.getParameter("id");
 		if(StringUtils.isEmpty(id)){
 			id="000000";
@@ -83,7 +84,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 		
 		JSONObject jsonParam=JSONObject.fromObject(codevalue);
 		String url=API_BASE_URL+URL+"/codetype/treedata";
-		return HttpRequestUtils.httpPost(url, jsonParam).toString();
+		return (List<CodeValue> )HttpRequestUtils.httpPostReturnList(url, jsonParam,CodeValue.class);
 		
 	}
 	
@@ -146,10 +147,10 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	@RequestMapping(value = "/codetype_treedata")
 	@ResponseBody
 	@RequiresRoles("admin")
-	public String codetype_treedata(HttpServletRequest request, HttpServletResponse response,CodeType codetype) throws AppException {
+	public List<CodeType> codetype_treedata(HttpServletRequest request, HttpServletResponse response,CodeType codetype) throws AppException {
 		JSONObject jsonParam=JSONObject.fromObject(codetype);
 		String url=API_BASE_URL+URL+"/codetype_treedata";
-		return HttpRequestUtils.httpPost(url, jsonParam).toString();
+		return (List<CodeType> )HttpRequestUtils.httpPostReturnList(url, jsonParam,CodeType.class);
 	}
 	
 	
@@ -167,7 +168,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	public ModelAndView toCodeValueTreePage(HttpServletRequest request, HttpServletResponse response,@PathVariable String id) throws AppException {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/codevalue/sysCodeTypeEdit");
 		String url=API_BASE_URL+URL+"/toCodeValueTreePage/"+id;
-		JSONObject jsonresult=HttpRequestUtils.httpGet(url);
+		JSONObject jsonresult=HttpRequestUtils.httpGetReturnObject(url);
 		modelAndView.addObject("codetype", JSONObject.toBean(jsonresult, CodeType.class));
         return modelAndView;
 	}
@@ -183,10 +184,10 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	@RequestMapping(value = "/codevalue_treedata")
 	@ResponseBody
 	@RequiresRoles("admin")
-	public String codevalue_treedata(HttpServletRequest request, HttpServletResponse response,CodeType  codetype) throws AppException {
+	public List<CodeValue> codevalue_treedata(HttpServletRequest request, HttpServletResponse response,CodeType  codetype) throws AppException {
 		JSONObject jsonParam=JSONObject.fromObject(codetype);
 		String url=API_BASE_URL+URL+"/codevalue_treedata";
-		return HttpRequestUtils.httpPost(url, jsonParam).toString();
+		return (List<CodeValue>)HttpRequestUtils.httpPostReturnList(url, jsonParam,CodeValue.class);
 	}
 	
 	
@@ -201,7 +202,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	public ModelAndView toCodeTypeEdit(HttpServletRequest request,Model model,@PathVariable String id) throws Exception {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/codevalue/sysCodeTypeInfoEdit");
 		String url=API_BASE_URL+URL+"/toCodeTypeEdit/"+id;
-		JSONObject jsonresult= HttpRequestUtils.httpGet(url);
+		JSONObject jsonresult= HttpRequestUtils.httpGetReturnObject(url);
 		modelAndView.addObject("codetype", JSONObject.toBean(jsonresult, CodeType.class));
         return modelAndView;
 	}
@@ -252,7 +253,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	public ModelAndView toCodeTypeDetailEdit(HttpServletRequest request,Model model,@PathVariable String id) throws Exception {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/codevalue/sysCodeTypeDetailInfoEdit");
 		String url=API_BASE_URL+URL+"/toCodeTypeDetailEdit";
-		JSONObject jsonresult= HttpRequestUtils.httpGet(url);
+		JSONObject jsonresult= HttpRequestUtils.httpGetReturnObject(url);
 		modelAndView.addObject("codevalue", JSONObject.toBean(jsonresult,CodeValue.class));
         return modelAndView;
 	}
@@ -272,7 +273,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/codevalue/sysCodeTypeDetailInfoAdd");
 		//通过代码类型获取代码明细
 		String url=API_BASE_URL+URL+"/toCodeTypeDetailAddFromRoot/"+code_type;
-		JSONObject jsonresult= HttpRequestUtils.httpGet(url);
+		JSONObject jsonresult= HttpRequestUtils.httpGetReturnObject(url);
 		CodeType codetype=(CodeType)JSONObject.toBean(jsonresult, CodeType.class);
 		CodeValue codevalue=new CodeValue();
 	    //在根结点下新增加代码值明细时默认的父节点代码值为代码类型表中的code_root_value
@@ -296,7 +297,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/codevalue/sysCodeTypeDetailInfoAdd");
 		//通过代码类型获取代码明细
 		String url=API_BASE_URL+URL+"/toCodeTypeDetailAddFromNode/"+par_code_seq;
-		JSONObject jsonresult= HttpRequestUtils.httpGet(url);
+		JSONObject jsonresult= HttpRequestUtils.httpGetReturnObject(url);
 		CodeValue codevalue=(CodeValue)JSONObject.toBean(jsonresult, CodeValue.class);
 		//设置当前节点的父结点信息为选中的结点的信息
 		codevalue.setPar_code_value(codevalue.getCode_value());
@@ -398,7 +399,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	 public String getCodeValueList(HttpServletRequest request, HttpServletResponse response,CodeType codetype) throws AppException {
 			JSONObject jsonParam=JSONObject.fromObject(codetype);
 			String url=API_BASE_URL+URL+"/getCodeValueList";
-			return HttpRequestUtils.httpPost(url, jsonParam).getJSONArray("obj").toString();
+			return HttpRequestUtils.httpPostReturnArray(url, jsonParam).toString();
 	 } 
 	
 }

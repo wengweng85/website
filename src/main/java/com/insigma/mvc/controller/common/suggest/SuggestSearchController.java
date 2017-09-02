@@ -50,7 +50,7 @@ public class SuggestSearchController extends MvcHelper<SuggestKey> {
 	public String searchcodebykey(HttpServletRequest request, HttpServletResponse response,SuggestKey key) throws AppException {
 		JSONObject jsonParam=JSONObject.fromObject(key);
 		String url=API_BASE_URL+"/common/suggest/searchcode";
-		return HttpRequestUtils.httpPost(url, jsonParam).toString();
+		return HttpRequestUtils.httpPostReturnObject(url, jsonParam).toString();
 	}
 
 }

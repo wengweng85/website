@@ -78,7 +78,7 @@ public class DemoController extends MvcHelper<DemoAc01> {
 		//转换成json对象并调用远程接口
 		JsonParseUtil<DemoAc01> jsonParseUtil=new JsonParseUtil<DemoAc01>();
 		String url=API_BASE_URL+URL+"/getAc01List";
-		return HttpRequestUtils.httpPost(url, jsonParseUtil.toJsonObject(ac01)).getJSONObject("obj").toString();
+		return HttpRequestUtils.httpPostReturnObject(url, jsonParseUtil.toJsonObject(ac01)).toString();
 	}
 	
 
@@ -108,9 +108,9 @@ public class DemoController extends MvcHelper<DemoAc01> {
 	public ModelAndView toedit(HttpServletRequest request,Model model,@PathVariable String id) throws Exception {
 		ModelAndView modelAndView=new ModelAndView("/demo/demoEdit");
 		String url=API_BASE_URL+URL+"/getDemoById/"+id;
-		JSONObject jsonobject=HttpRequestUtils.httpGet(url);
+		JSONObject jsonobject=HttpRequestUtils.httpGetReturnObject(url);
 		//返回jsonobject并转换成相应对象
-		modelAndView.addObject("ac01",JSONObject.toBean(jsonobject.getJSONObject("obj"),DemoAc01.class));  
+		modelAndView.addObject("ac01",JSONObject.toBean(jsonobject,DemoAc01.class));  
         return modelAndView;
 	}
 	
@@ -124,9 +124,9 @@ public class DemoController extends MvcHelper<DemoAc01> {
 	public ModelAndView toview(HttpServletRequest request,Model model,@PathVariable String id) throws Exception {
 		ModelAndView modelAndView=new ModelAndView("/demo/demoView");
 		String url=API_BASE_URL+URL+"/getDemoById/"+id;
-		JSONObject jsonobject=HttpRequestUtils.httpGet(url);
+		JSONObject jsonobject=HttpRequestUtils.httpGetReturnObject(url);
 		//返回jsonobject并转换成相应对象
-		modelAndView.addObject("ac01",JSONObject.toBean(jsonobject.getJSONObject("obj"),DemoAc01.class));  
+		modelAndView.addObject("ac01",JSONObject.toBean(jsonobject,DemoAc01.class));  
         return modelAndView;
 	}
 	
@@ -182,7 +182,7 @@ public class DemoController extends MvcHelper<DemoAc01> {
 	public String getDemoById(HttpServletRequest request,Model model,@PathVariable String id) throws Exception {
 		//转换成json对象并调用远程接口
 		String url=API_BASE_URL+URL+"/getDemoById/"+id;
-		return HttpRequestUtils.httpGet(url).getJSONObject("obj").toString();
+		return HttpRequestUtils.httpGetReturnObject(url).toString();
 	}
 	
 	
@@ -217,7 +217,7 @@ public class DemoController extends MvcHelper<DemoAc01> {
 		ac01.setAac001(id);
 		ac01.setBus_uuid (bus_uuid);
 		String url=API_BASE_URL+URL+"/updatefile/"+id+"/"+bus_uuid;
-		return HttpRequestUtils.httpGet(url).toString();
+		return HttpRequestUtils.httpGetReturnObject(url).toString();
 	}
 	
 	/**
@@ -233,7 +233,7 @@ public class DemoController extends MvcHelper<DemoAc01> {
 		ac01.setBus_uuid(bus_uuid);
 		//转换成json对象并调用远程接口
 		String url=API_BASE_URL+URL+"/deletefile/"+id+"/"+bus_uuid;
-		return HttpRequestUtils.httpGet(url).toString();
+		return HttpRequestUtils.httpGetReturnObject(url).toString();
 	}
 	
 	/**
@@ -246,5 +246,7 @@ public class DemoController extends MvcHelper<DemoAc01> {
 		ModelAndView modelAndView=new ModelAndView("demo/api_test_page");
         return modelAndView;
 	}
+	
+	
 
 }
