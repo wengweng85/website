@@ -57,15 +57,12 @@ public class ApplicationListener implements   ServletContextListener  {
 		if(syn_flag){
 			String url=API_BASE_URL+"/codetype/getInitcodetypeList";
 			try{
-					JSONArray jsonarray=HttpRequestUtils.httpGetReturnArray(url);
-					//返回jsonobject并转换成相应对象
-					List <CodeType> list_code_type= JSONArray.toList (jsonarray,CodeType.class);  
+				    List <CodeType> list_code_type=new HttpRequestUtils<CodeType>().httpGetReturnList(url,CodeType.class);
 					//code_type code_value同步
 					for(CodeType codetype : list_code_type){
 						String code_type=codetype.getCode_type();
 						url=API_BASE_URL+"/codetype/getInitCodeValueList/"+code_type;
-						jsonarray=HttpRequestUtils.httpGetReturnArray(url);
-						List<CodeValue> list_code_value  =JSONArray.toList(jsonarray,CodeValue.class);
+						List<CodeValue> list_code_value=new HttpRequestUtils<CodeValue>().httpGetReturnList(url,CodeValue.class);
 						if (list_code_value.size() > 0) {
 							//将代码参加加载到redis缓存中
 								//将代码参加加载到ehcache缓存中

@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.sf.json.JSONObject;
-
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -69,7 +67,7 @@ public class SysUserRoleController extends MvcHelper {
 			parentid="G001";
 		}
 		String url=API_BASE_URL+URL+"/treedata/"+parentid;
-		return (List<SGroup>)HttpRequestUtils.httpGetReturnList(url,SGroup.class);
+		return new HttpRequestUtils<SGroup>().httpGetReturnList(url,SGroup.class);
 	}
 	
 	
@@ -83,7 +81,7 @@ public class SysUserRoleController extends MvcHelper {
 	@ResponseBody
 	public String getgroupdata(HttpServletRequest request,Model model,@PathVariable String id ) throws Exception {
 		String url=API_BASE_URL+URL+"/getgroupdatabyid/"+id;
-		return HttpRequestUtils.httpGet(url).toString();
+		return new HttpRequestUtils<String>().httpGet(url).toString();
 	}
 	
 	/**
@@ -98,9 +96,8 @@ public class SysUserRoleController extends MvcHelper {
 		if(StringUtils.isEmpty(sgroup.getGroupid())){
 			sgroup.setGroupid("G001");
 		}
-		JSONObject jsonParam=JSONObject.fromObject(sgroup);
 		String url=API_BASE_URL+URL+"/getUserListDataByid/";
-		return HttpRequestUtils.httpPost(url,jsonParam).toString();
+		return new HttpRequestUtils<SGroup>().httpPost(url,sgroup).toString();
 	}
 	
 	
@@ -116,9 +113,8 @@ public class SysUserRoleController extends MvcHelper {
 		if(StringUtils.isEmpty(srole.getUserid())){
 			srole.setUserid("");
 		}
-		JSONObject jsonParam=JSONObject.fromObject(srole);
 		String url=API_BASE_URL+URL+"/getRoleByUserId/";
-		return HttpRequestUtils.httpPost(url,jsonParam).toString();
+		return new HttpRequestUtils<SRole>().httpPost(url,srole).toString();
 	}
 	
 	
@@ -134,8 +130,7 @@ public class SysUserRoleController extends MvcHelper {
 	@RequiresRoles("admin")
 	@ResponseBody
 	public String saveUserRole(HttpServletRequest request,Model model,SRole srole ) throws Exception {
-		JSONObject jsonParam=JSONObject.fromObject(srole);
 		String url=API_BASE_URL+URL+"/saveUserRole/";
-		return HttpRequestUtils.httpPost(url,jsonParam).toString();
+		return new HttpRequestUtils<SRole>().httpPost(url,srole).toString();
 	}
 }

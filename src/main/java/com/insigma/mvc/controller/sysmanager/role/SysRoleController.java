@@ -65,9 +65,8 @@ public class SysRoleController extends MvcHelper<SRole>  {
 	@ResponseBody
 	@RequiresRoles("admin")
 	public String querylist(HttpServletRequest request,Model model,SRole srole) throws Exception {
-		JSONObject jsonParam=JSONObject.fromObject(srole);
 		String url=API_BASE_URL+URL+"/querylist/";
-		return  HttpRequestUtils.httpPostReturnObject(url, jsonParam).toString();
+		return  new HttpRequestUtils<SRole>().httpPostReturnObject(url, srole).toString();
 	}
 	
 	
@@ -81,7 +80,7 @@ public class SysRoleController extends MvcHelper<SRole>  {
 	@ResponseBody
 	public String  getPermDataByid(HttpServletRequest request, HttpServletResponse response,Model model,@PathVariable String id) throws Exception {
 		String url=API_BASE_URL+URL+"/getRoleData/"+id;
-		return HttpRequestUtils.httpGet(url).toString();
+		return new HttpRequestUtils<String>().httpGet(url).toString();
 	}
 	
 	
@@ -94,7 +93,7 @@ public class SysRoleController extends MvcHelper<SRole>  {
 	public ModelAndView toRoleEdit(HttpServletRequest request,@PathVariable String id) throws Exception {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/role/sysRoleEdit");
 		String url=API_BASE_URL+URL+"/toRoleEdit/"+id;
-		JSONObject jsonresult= HttpRequestUtils.httpGetReturnObject(url);
+		JSONObject jsonresult= new HttpRequestUtils<String>().httpGetReturnObject(url);
 		modelAndView.addObject("srole",JSONObject.toBean(jsonresult, SRole.class));  
         return modelAndView;
 	}
@@ -108,7 +107,7 @@ public class SysRoleController extends MvcHelper<SRole>  {
 	@RequiresRoles("admin")
 	public String  deleteRoleDataById(HttpServletRequest request,Model model,@PathVariable String id) throws Exception {
 		String url=API_BASE_URL+URL+"/deleteRoleDataById/"+id;
-		return HttpRequestUtils.httpGet(url).toString();
+		return new HttpRequestUtils<String>().httpGet(url).toString();
 	}
 	
 	/**
@@ -124,9 +123,8 @@ public class SysRoleController extends MvcHelper<SRole>  {
 		if (result.hasErrors()){
 			return validate(result);
 		}
-		JSONObject jsonParam=JSONObject.fromObject(srole);
 		String url=API_BASE_URL+URL+"/saveorupdate";
-		return HttpRequestUtils.httpPost(url,jsonParam).toString();
+		return new HttpRequestUtils<SRole>().httpPost(url,srole).toString();
 	}
 	
 	/**
@@ -140,7 +138,7 @@ public class SysRoleController extends MvcHelper<SRole>  {
 	public  List<SRole>  treedata(HttpServletRequest request, HttpServletResponse response,Model model) throws Exception {
 		String id=request.getParameter("id");
 		String url=API_BASE_URL+URL+"/treedata/"+id;
-		return (List<SRole>)HttpRequestUtils.httpGetReturnList(url,SRole.class);
+		return new HttpRequestUtils<SRole>().httpGetReturnList(url,SRole.class);
 	}
 	
 	
@@ -153,8 +151,7 @@ public class SysRoleController extends MvcHelper<SRole>  {
 	@ResponseBody
 	@RequiresRoles("admin")
 	public String  saveroleperm(HttpServletRequest request,Model model,SRole srole) throws Exception {
-		JSONObject jsonParam=JSONObject.fromObject(srole);
 		String url=API_BASE_URL+URL+"/saveroleperm";
-		return HttpRequestUtils.httpPost(url,jsonParam).toString();
+		return new HttpRequestUtils<SRole>().httpPost(url,srole).toString();
 	}
 }

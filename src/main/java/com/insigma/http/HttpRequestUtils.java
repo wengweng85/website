@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.net.URLDecoder;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -17,11 +18,12 @@ import net.sf.json.JsonConfig;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import com.insigma.json.JsonDateValueProcessor;
@@ -29,24 +31,24 @@ import com.insigma.resolver.AppException;
 
 public class HttpRequestUtils<T> {
 	
-	public  static JsonConfig jsonConfig;
 	
-	static{
+	private  Log log = LogFactory.getLog(HttpRequestUtils.class);    //日志记录
+	 
+	public   JsonConfig jsonConfig;
+	private  String appkey="faaaac26-8f96-11e7-bb31-be2e44b06b34";
+	
+	public HttpRequestUtils(){
 		jsonConfig=new JsonConfig();
 		jsonConfig.registerJsonValueProcessor(Date.class, new JsonDateValueProcessor());
 	}
-	 
-    private static Log log = LogFactory.getLog(HttpRequestUtils.class);    //日志记录
- 
-    private static String appkey="faaaac26-8f96-11e7-bb31-be2e44b06b34";
     
     /**
      * 发送get请求 返回json对象
      * @param url    路径
      * @return
      */
-    public static JSONObject httpPostReturnObject(String url,JSONObject jsonParam) throws AppException{
-        return httpPost(url,jsonParam).getJSONObject("obj");
+    public  JSONObject httpPostReturnObject(String url,T t) throws AppException{
+        return httpPost(url,t).getJSONObject("obj");
     }
     
     /**
@@ -54,8 +56,8 @@ public class HttpRequestUtils<T> {
      * @param url    路径
      * @return
      */
-    public static JSONArray httpPostReturnArray(String url,JSONObject jsonParam) throws AppException{
-    	return httpPost(url,jsonParam).getJSONArray("obj");
+    public  JSONArray httpPostReturnArray(String url,T t) throws AppException{
+    	return httpPost(url,t).getJSONArray("obj");
     }
     
     /**
@@ -66,8 +68,8 @@ public class HttpRequestUtils<T> {
      * @return
      * @throws AppException
      */
-    public static Object httpPostReturnList(String url,JSONObject jsonParam,Class beanclass) throws AppException{
-    	return toList(httpPostReturnArray(url,jsonParam),beanclass);
+    public  List<T> httpPostReturnList(String url,T t) throws AppException{
+    	return toList(httpPostReturnArray(url,t),t);
     }
     
  
@@ -76,7 +78,7 @@ public class HttpRequestUtils<T> {
      * @param url    路径
      * @return
      */
-    public static JSONObject httpGetReturnObject(String url) throws AppException{
+    public  JSONObject httpGetReturnObject(String url) throws AppException{
         return httpGet(url).getJSONObject("obj");
     }
     
@@ -85,7 +87,7 @@ public class HttpRequestUtils<T> {
      * @param url    路径
      * @return
      */
-    public static JSONArray httpGetReturnArray(String url) throws AppException{
+    public JSONArray httpGetReturnArray(String url) throws AppException{
     	return httpGet(url).getJSONArray("obj");
     }
     
@@ -96,10 +98,11 @@ public class HttpRequestUtils<T> {
      * @return
      * @throws AppException
      */
-    public static Object httpGetReturnList(String url,Class beanclass) throws AppException{
-    	return toList(httpGetReturnArray(url),beanclass);
+    public  List<T> httpGetReturnList(String url,Class c) throws AppException{
+    	return toList(httpGetReturnArray(url),c);
     }
-  
+
+    
     
     /**
      * post请求
@@ -108,79 +111,102 @@ public class HttpRequestUtils<T> {
      * @param noNeedResponse    不需要返回结果
      * @return
      */
-    public static JSONObject httpPost(String url,JSONObject jsonParam) throws AppException{
-    	//post请求返回结果
-    	DefaultHttpClient httpClient = new DefaultHttpClient();
+    public JSONObject httpPost(String url,T t) throws AppException{
+    	   return httpPost(url,t,ContentType.JSON);
+    }
+    
+	/**
+	 *  post请求
+	 * @param url 地址
+	 * @param t 对象
+	 * @param contentType 请求类型 json或者x-www-form
+	 * @return
+	 * @throws AppException
+	 */
+    public JSONObject httpPost(String url,T t,ContentType contentType) throws AppException{
+    	CloseableHttpClient httpClient = HttpClients.createDefault();
+    	CloseableHttpResponse response =null;
         JSONObject jsonResult = null;
         String str = "";
         HttpPost httppost = new HttpPost(url);
         httppost.setHeader("appkey", appkey);
         try {
-            if (null != jsonParam) {
-                //解决中文乱码问题
-                StringEntity entity = new StringEntity(jsonParam.toString(), "utf-8");
-                entity.setContentEncoding("UTF-8");
-                entity.setContentType("application/json");
-                httppost.setEntity(entity);
+            if (null != t) {
+            	if(contentType.equals(ContentType.X_WWW_FORM_URLENCODED)){
+            		//解决中文乱码问题
+                    StringEntity entity = new StringEntity(parseURLPair(t), "utf-8");
+                    entity.setContentEncoding("UTF-8");
+                    entity.setContentType("application/x-www-form-urlencoded");
+                    httppost.setEntity(entity);
+            	}else if(contentType.equals(ContentType.JSON)){
+            		//解决中文乱码问题
+                    StringEntity entity = new StringEntity(toJsonObject(t).toString(), "utf-8");
+                    entity.setContentEncoding("UTF-8");
+                    entity.setContentType("application/json");
+                    httppost.setEntity(entity);
+                   }
             }
-            HttpResponse result = httpClient.execute(httppost);
+            /**返回结果*/
+            response = httpClient.execute(httppost);
             url = URLDecoder.decode(url, "UTF-8");
             /**请求发送成功，并得到响应**/
-            if (result.getStatusLine().getStatusCode() == 200) {
-                try {
+            if (response.getStatusLine().getStatusCode() == 200) {
                     /**读取服务器返回过来的json字符串数据**/
-                    str = EntityUtils.toString(result.getEntity());
+                    str = EntityUtils.toString(response.getEntity());
                     /**把json字符串转换成json对象**/
                     jsonResult = JSONObject.fromObject(str);
                     /**是否成功*/
                     String success= jsonResult.getString("success");
                     if(success.equals("true")){
-                    	log.info("调用接口"+url+"成功");
+                    	 log.info("调用接口"+url+"成功");
                     }else{
-                    	log.info("调用接口"+url+"失败,错误原因:"+jsonResult.getString("message"));
-                    	throw new AppException("调用接口"+url+"失败,错误原因:"+jsonResult.getString("message"));
+                    	 log.info("调用接口"+url+"失败,错误原因:"+jsonResult.getString("message"));
+                    	 throw new AppException("调用接口"+url+"失败,错误原因:"+jsonResult.getString("message"));
                     }
-                } catch (Exception e) {
-                    log.error("post请求提交失败:" + url, e);
-                    throw new AppException("get请求提交失败:" + url, e);
-                }
             }else{
-            	 log.error("post请求提交失败:" +url+result );
-            	 throw new AppException("post请求提交失败:" +url+result);
+            	 log.error("post请求提交失败:" +url+response );
+            	 throw new AppException("post请求提交失败:" +url+response);
             }
-        } catch (IOException e) {
-            log.error("post请求提交失败:" + url, e);
-            throw new AppException("get请求提交失败:" + url, e);
+        } catch (Exception e) {
+            log.error("post请求提交发生异常:" + url, e);
+            throw new AppException("post请求提交发生异常:" + url, e);
+        }finally {
+            if(response != null){
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(httpClient != null){
+                try {
+                    httpClient.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return jsonResult;
     }
     
-    /**
-     * 发送get请求
-     * @param url    路径
-     * @return
-     */
-    public static JSONObject httpGet(String url) throws AppException{
-        //get请求返回结果
-        JSONObject jsonResult = null;
+   /**
+    * 发送get请求
+    * @param url
+    * @return
+    * @throws AppException
+    */
+    public  JSONObject httpGet(String url) throws AppException{
+    	CloseableHttpClient httpClient =null;
+    	CloseableHttpResponse response =null;
+    	JSONObject jsonResult = null;
         String strResult="";
         try {
-        	DefaultHttpClient client = new DefaultHttpClient();
+        	 httpClient = HttpClients.createDefault();
+        	 response =null;
             //发送get请求
             HttpGet request = new HttpGet(url);
-            
             request.setHeader("appkey", appkey);
-            //设置httpGet的头部参数信息
-            //request.setHeader("Accept", "Accept text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");    
-            /*request.setHeader("Accept-Charset", "GB2312,utf-8;q=0.7,*;q=0.7");    
-            request.setHeader("Accept-Encoding", "gzip, deflate");    
-            request.setHeader("Accept-Language", "zh-cn,zh;q=0.5");    
-            request.setHeader("Connection", "keep-alive");    
-            request.setHeader("Cookie", "__utma=226521935.73826752.1323672782.1325068020.1328770420.6;");    
-            request.setHeader("Host", "www.cnblogs.com");    
-            request.setHeader("refer", "http://www.baidu.com/s?tn=monline_5_dg&bs=httpclient4+MultiThreadedHttpConnectionManager");    
-            request.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; rv:6.0.2) Gecko/20100101 Firefox/6.0.2");    */
-            HttpResponse response = client.execute(request);
+            response = httpClient.execute(request);
  
             /**请求发送成功，并得到响应**/
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
@@ -204,6 +230,21 @@ public class HttpRequestUtils<T> {
         } catch (IOException e) {
         	log.error("get请求提交失败:" + url, e);
         	throw new AppException("get请求提交失败:" + url, e);
+        }finally {
+            if(response != null){
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(httpClient != null){
+                try {
+                    httpClient.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return jsonResult;
     }
@@ -213,7 +254,7 @@ public class HttpRequestUtils<T> {
      * @param t
      * @return
      */
-    public  static JSONObject toJsonObject(Object t){
+    public   JSONObject toJsonObject(T t){
 		JSONObject jsonParam=JSONObject.fromObject(t,jsonConfig);
 		return jsonParam;
 	}
@@ -223,8 +264,8 @@ public class HttpRequestUtils<T> {
      * @param t
      * @return
      */
-    public  static Object tobean(JSONObject jsonobject,Class beanclass){
-		return JSONObject.toBean(jsonobject, beanclass);
+    public  T tobean(JSONObject jsonobject,T t){
+		return (T)JSONObject.toBean(jsonobject, t.getClass());
 	}
     
     /**
@@ -232,9 +273,17 @@ public class HttpRequestUtils<T> {
      * @param t
      * @return
      */
-    @SuppressWarnings("deprecation")
-	public  static  Object toList(JSONArray jsonarray,Class beanclass){
-    	return JSONArray.toList(jsonarray, beanclass);
+	public   List<T> toList(JSONArray jsonarray,T t){
+    	return (List<T>)JSONArray.toList(jsonarray,t.getClass());
+	}
+	
+	 /**
+     * jsonobject转换成对象数组
+     * @param t
+     * @return
+     */
+	public   List<T> toList(JSONArray jsonarray,Class c){
+    	return (List<T>)JSONArray.toList(jsonarray,c);
 	}
     
     /**
@@ -243,24 +292,30 @@ public class HttpRequestUtils<T> {
      * @return
      * @throws Exception
      */
-    public static String parseURLPair(Object o) throws Exception{  
-	        Class<? extends Object> c = o.getClass();  
+    public  String parseURLPair(T t) throws Exception{  
+    	    Class<? extends Object>c = t.getClass();
 	        Field[] fields = c.getDeclaredFields();  
 	        Map<String, Object> map = new TreeMap<String, Object>();  
 	        for (Field field : fields) {  
 	            field.setAccessible(true);  
 	            String name = field.getName();  
-	            Object value = field.get(o);  
+	            Object value = field.get(t);  
 	            if(value != null)  
 	                map.put(name, value);  
 	        }  
 	        Set<Entry<String, Object>> set = map.entrySet();  
 	        Iterator<Entry<String, Object>> it = set.iterator();  
-	        StringBuffer sb = new StringBuffer();  
+	        StringBuffer sb = new StringBuffer("");  
 	        while (it.hasNext()) {  
 	             Entry<String, Object> e = it.next();  
 	             sb.append(e.getKey()).append("=").append(e.getValue()).append("&");  
 	        }  
-	        return sb.deleteCharAt(sb.length()-1).toString();  
+	        System.out.println(sb.toString()+"length="+sb.length());
+	        if(sb.length()>0){
+	        	 System.out.println(sb.toString());
+	        	 return sb.deleteCharAt(sb.length()-1).toString();  
+	        }else{
+	        	return "";
+	        }
     } 
 }

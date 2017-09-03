@@ -50,7 +50,7 @@ public class MyShiroRealm extends AuthorizingRealm {
 		try {
 			// 调用接口
 			String url = API_BASE_URL + "/getUserAndGroupInfo/"+ token.getUsername();
-			JSONObject jsonobject = HttpRequestUtils.httpGetReturnObject(url);
+			JSONObject jsonobject = new HttpRequestUtils<String>().httpGetReturnObject(url);
 			SUser suser = (SUser) JSONObject.toBean(jsonobject, SUser.class);
 	
 			if (suser == null) {
@@ -67,8 +67,7 @@ public class MyShiroRealm extends AuthorizingRealm {
 			// 用户权限
 			
 			url = API_BASE_URL + "/findPermissionStr/" + token.getUsername();
-			JSONArray jsonarray = HttpRequestUtils.httpGetReturnArray(url);
-			List<SPermission> permlist = JSONArray.toList(jsonarray,SPermission.class);
+			List<SPermission> permlist = new HttpRequestUtils<SPermission>().httpGetReturnList(url,SPermission.class);
 			EhCacheUtil
 					.getManager()
 					.getCache("webcache")
@@ -94,8 +93,7 @@ public class MyShiroRealm extends AuthorizingRealm {
 				// 用户角色
 
 				String url = API_BASE_URL + "/findRolesStr/" + loginname;
-				JSONArray jsonarray = HttpRequestUtils.httpGetReturnArray(url);
-				List<SRole> rolelist = JSONArray.toList(jsonarray,SRole.class);
+				List<SRole> rolelist = new HttpRequestUtils<SRole>().httpGetReturnList(url,SRole.class);
 				if (rolelist != null) {
 					Set<String> roleset = new HashSet<String>();
 					Iterator iterator_role = rolelist.iterator();
@@ -108,9 +106,7 @@ public class MyShiroRealm extends AuthorizingRealm {
 
 				// 用户权限
 				url = API_BASE_URL + "/findPermissionStr/" + loginname;
-				jsonarray = HttpRequestUtils.httpGetReturnArray(url);
-				List<SPermission> permlist = JSONArray.toList(jsonarray,SPermission.class);
-
+				List<SPermission> permlist = new HttpRequestUtils<SPermission>().httpGetReturnList(url,SPermission.class);
 				EhCacheUtil
 						.getManager()
 						.getCache("webcache")

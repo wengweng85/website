@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.shiro.authz.annotation.RequiresRoles;
@@ -67,7 +66,7 @@ public class SysPermController extends MvcHelper<SPermission> {
 	@ResponseBody
 	public List<SPermission>  treedata(HttpServletRequest request, HttpServletResponse response,Model model) throws Exception {
 		String url=API_BASE_URL+URL+"/treedata";
-		return JSONArray.toList(HttpRequestUtils.httpGetReturnArray(url),SPermission.class);
+		return new HttpRequestUtils<SPermission>().httpGetReturnList(url,SPermission.class);
 	}
 	
 	
@@ -81,7 +80,7 @@ public class SysPermController extends MvcHelper<SPermission> {
 	@ResponseBody
 	public String  getPermDataByid(HttpServletRequest request, HttpServletResponse response,Model model,@PathVariable String id) throws Exception {
 		String url=API_BASE_URL+URL+"/getPermData/"+id;
-		return HttpRequestUtils.httpGet(url).toString();
+		return new HttpRequestUtils<String>().httpGet(url).toString();
 	}
 	
 	
@@ -98,9 +97,8 @@ public class SysPermController extends MvcHelper<SPermission> {
 		if (result.hasErrors()){
 			return validate(result);
 		}
-		JSONObject jsonParam=JSONObject.fromObject(spermission);
 		String url=API_BASE_URL+URL+"/saveorupdate/";
-		return HttpRequestUtils.httpPost(url,jsonParam).toString();
+		return new HttpRequestUtils<SPermission>().httpPost(url,spermission).toString();
 		
 	}
 	
@@ -114,7 +112,7 @@ public class SysPermController extends MvcHelper<SPermission> {
 	@RequiresRoles("admin")
 	public String  deletePermDataById(HttpServletRequest request,Model model,@PathVariable String id) throws Exception {
 		String url=API_BASE_URL+URL+"/deletePermDataById/"+id;
-		return HttpRequestUtils.httpGet(url).toString();
+		return new HttpRequestUtils<String>().httpGet(url).toString();
 	}
 	
 	/**
@@ -127,6 +125,6 @@ public class SysPermController extends MvcHelper<SPermission> {
 	@RequiresRoles("admin")
 	public String  moveNode(HttpServletRequest request,Model model,@PathVariable String id) throws Exception {
 		String url=API_BASE_URL+URL+"/moveNode/"+id;
-		return HttpRequestUtils.httpGet(url).toString();
+		return new HttpRequestUtils<String>().httpGet(url).toString();
 	}
 }

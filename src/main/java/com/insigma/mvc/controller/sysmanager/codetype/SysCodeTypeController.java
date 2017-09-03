@@ -82,9 +82,8 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 		codevalue.setPar_code_value(id);
 		codevalue.setCode_type(code_type.toUpperCase());
 		
-		JSONObject jsonParam=JSONObject.fromObject(codevalue);
 		String url=API_BASE_URL+URL+"/codetype/treedata";
-		return (List<CodeValue> )HttpRequestUtils.httpPostReturnList(url, jsonParam,CodeValue.class);
+		return (List<CodeValue> ) new  HttpRequestUtils<CodeValue>().httpPostReturnList(url, codevalue);
 		
 	}
 	
@@ -101,7 +100,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	public String queryByCodeTypeAndParent(HttpServletRequest request, HttpServletResponse response,CodeValue codevalue) throws AppException {
 		JSONObject jsonParam=JSONObject.fromObject(codevalue);
 		String url=API_BASE_URL+URL+"/queryByCodeTypeAndParent";
-		return HttpRequestUtils.httpPost(url, jsonParam).toString();
+		return new HttpRequestUtils().httpPost(url, jsonParam).toString();
 	}
 	
 	
@@ -118,7 +117,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	public String getCodeValueFromCache(HttpServletRequest request, HttpServletResponse response,CodeValue codevalue) throws AppException {
 		JSONObject jsonParam=JSONObject.fromObject(codevalue);
 		String url=API_BASE_URL+URL+"/getCodeValueFromCache";
-		return HttpRequestUtils.httpPost(url, jsonParam).toString();
+		return new HttpRequestUtils().httpPost(url, jsonParam).toString();
 	}
 	
 	
@@ -148,9 +147,8 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	@ResponseBody
 	@RequiresRoles("admin")
 	public List<CodeType> codetype_treedata(HttpServletRequest request, HttpServletResponse response,CodeType codetype) throws AppException {
-		JSONObject jsonParam=JSONObject.fromObject(codetype);
 		String url=API_BASE_URL+URL+"/codetype_treedata";
-		return (List<CodeType> )HttpRequestUtils.httpPostReturnList(url, jsonParam,CodeType.class);
+		return new HttpRequestUtils<CodeType>().httpPostReturnList(url, codetype);
 	}
 	
 	
@@ -168,7 +166,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	public ModelAndView toCodeValueTreePage(HttpServletRequest request, HttpServletResponse response,@PathVariable String id) throws AppException {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/codevalue/sysCodeTypeEdit");
 		String url=API_BASE_URL+URL+"/toCodeValueTreePage/"+id;
-		JSONObject jsonresult=HttpRequestUtils.httpGetReturnObject(url);
+		JSONObject jsonresult=new HttpRequestUtils<String>().httpGetReturnObject(url);
 		modelAndView.addObject("codetype", JSONObject.toBean(jsonresult, CodeType.class));
         return modelAndView;
 	}
@@ -184,10 +182,9 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	@RequestMapping(value = "/codevalue_treedata")
 	@ResponseBody
 	@RequiresRoles("admin")
-	public List<CodeValue> codevalue_treedata(HttpServletRequest request, HttpServletResponse response,CodeType  codetype) throws AppException {
-		JSONObject jsonParam=JSONObject.fromObject(codetype);
+	public List<CodeValue> codevalue_treedata(HttpServletRequest request, HttpServletResponse response,CodeValue  codevalue) throws AppException {
 		String url=API_BASE_URL+URL+"/codevalue_treedata";
-		return (List<CodeValue>)HttpRequestUtils.httpPostReturnList(url, jsonParam,CodeValue.class);
+		return new HttpRequestUtils<CodeValue>().httpPostReturnList(url, codevalue);
 	}
 	
 	
@@ -202,7 +199,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	public ModelAndView toCodeTypeEdit(HttpServletRequest request,Model model,@PathVariable String id) throws Exception {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/codevalue/sysCodeTypeInfoEdit");
 		String url=API_BASE_URL+URL+"/toCodeTypeEdit/"+id;
-		JSONObject jsonresult= HttpRequestUtils.httpGetReturnObject(url);
+		JSONObject jsonresult= new HttpRequestUtils<String>().httpGetReturnObject(url);
 		modelAndView.addObject("codetype", JSONObject.toBean(jsonresult, CodeType.class));
         return modelAndView;
 	}
@@ -237,9 +234,8 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 		if (result.hasErrors()){
 			return validate(result);
 		}
-		JSONObject jsonParam=JSONObject.fromObject(codetype);
 		String url=API_BASE_URL+URL+"/saveOrUpdateCodeType";
-		return HttpRequestUtils.httpPost(url, jsonParam).toString();
+		return new HttpRequestUtils<CodeType>().httpPost(url, codetype).toString();
 	}
 	
 	
@@ -253,7 +249,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	public ModelAndView toCodeTypeDetailEdit(HttpServletRequest request,Model model,@PathVariable String id) throws Exception {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/codevalue/sysCodeTypeDetailInfoEdit");
 		String url=API_BASE_URL+URL+"/toCodeTypeDetailEdit";
-		JSONObject jsonresult= HttpRequestUtils.httpGetReturnObject(url);
+		JSONObject jsonresult= new HttpRequestUtils<String>().httpGetReturnObject(url);
 		modelAndView.addObject("codevalue", JSONObject.toBean(jsonresult,CodeValue.class));
         return modelAndView;
 	}
@@ -273,7 +269,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/codevalue/sysCodeTypeDetailInfoAdd");
 		//通过代码类型获取代码明细
 		String url=API_BASE_URL+URL+"/toCodeTypeDetailAddFromRoot/"+code_type;
-		JSONObject jsonresult= HttpRequestUtils.httpGetReturnObject(url);
+		JSONObject jsonresult= new HttpRequestUtils<String>().httpGetReturnObject(url);
 		CodeType codetype=(CodeType)JSONObject.toBean(jsonresult, CodeType.class);
 		CodeValue codevalue=new CodeValue();
 	    //在根结点下新增加代码值明细时默认的父节点代码值为代码类型表中的code_root_value
@@ -297,7 +293,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 		ModelAndView modelAndView=new ModelAndView("sysmanager/codevalue/sysCodeTypeDetailInfoAdd");
 		//通过代码类型获取代码明细
 		String url=API_BASE_URL+URL+"/toCodeTypeDetailAddFromNode/"+par_code_seq;
-		JSONObject jsonresult= HttpRequestUtils.httpGetReturnObject(url);
+		JSONObject jsonresult= new HttpRequestUtils<String>().httpGetReturnObject(url);
 		CodeValue codevalue=(CodeValue)JSONObject.toBean(jsonresult, CodeValue.class);
 		//设置当前节点的父结点信息为选中的结点的信息
 		codevalue.setPar_code_value(codevalue.getCode_value());
@@ -320,9 +316,8 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 		if (result.hasErrors()){
 			return validate(result);
 		}
-		JSONObject jsonParam=JSONObject.fromObject(codevalue);
 		String url=API_BASE_URL+URL+"/saveOrUpdateCodeTypeDetail";
-		return HttpRequestUtils.httpPost(url, jsonParam).toString();
+		return new HttpRequestUtils<CodeValue>().httpPost(url, codevalue).toString();
 	}
 	
 	
@@ -336,7 +331,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	@RequiresRoles("admin")
 	public String deleteCodeType(HttpServletRequest request,Model model,@PathVariable String code_type) throws Exception {
 		String url=API_BASE_URL+URL+"/deleteCodeType/"+code_type;
-		return HttpRequestUtils.httpGet(url).toString();
+		return new HttpRequestUtils<String>().httpGet(url).toString();
 	}
 	
 	
@@ -350,7 +345,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	@RequiresRoles("admin")
 	public String deleteCodeValue(HttpServletRequest request,Model model,@PathVariable String code_seq) throws Exception {
 		String url=API_BASE_URL+URL+"/deleteCodeValue/"+code_seq;
-		return HttpRequestUtils.httpGet(url).toString();
+		return new HttpRequestUtils<String>().httpGet(url).toString();
 	}
 	
 	
@@ -399,7 +394,7 @@ public class SysCodeTypeController extends MvcHelper<CodeValue> {
 	 public String getCodeValueList(HttpServletRequest request, HttpServletResponse response,CodeType codetype) throws AppException {
 			JSONObject jsonParam=JSONObject.fromObject(codetype);
 			String url=API_BASE_URL+URL+"/getCodeValueList";
-			return HttpRequestUtils.httpPostReturnArray(url, jsonParam).toString();
+			return new HttpRequestUtils().httpPostReturnArray(url, jsonParam).toString();
 	 } 
 	
 }

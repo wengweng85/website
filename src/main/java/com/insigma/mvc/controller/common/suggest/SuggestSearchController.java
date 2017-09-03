@@ -3,8 +3,6 @@ package com.insigma.mvc.controller.common.suggest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
@@ -48,9 +46,8 @@ public class SuggestSearchController extends MvcHelper<SuggestKey> {
 	@RequestMapping(value = "/searchcode")
 	@ResponseBody
 	public String searchcodebykey(HttpServletRequest request, HttpServletResponse response,SuggestKey key) throws AppException {
-		JSONObject jsonParam=JSONObject.fromObject(key);
 		String url=API_BASE_URL+"/common/suggest/searchcode";
-		return HttpRequestUtils.httpPostReturnObject(url, jsonParam).toString();
+		return new HttpRequestUtils<SuggestKey>().httpPostReturnObject(url, key).toString();
 	}
 
 }

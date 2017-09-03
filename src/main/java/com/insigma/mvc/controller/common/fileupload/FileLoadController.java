@@ -107,9 +107,8 @@ public class FileLoadController extends MvcHelper<SFileRecord> {
 	@RequestMapping("/getFileList")
 	@ResponseBody
 	public String getUserListByGroupid(HttpServletRequest request,Model model,SFileRecord sFileRecord ) throws Exception {
-		JsonParseUtil<SFileRecord> jsonParseUtil=new JsonParseUtil<SFileRecord>();
 		String url=API_BASE_URL+URL+"/getFileList";
-		return HttpRequestUtils.httpPost(url, jsonParseUtil.toJsonObject(sFileRecord)).toString();
+		return new HttpRequestUtils<SFileRecord>().httpPost(url, sFileRecord).toString();
 	}
 	
     
@@ -238,7 +237,7 @@ public class FileLoadController extends MvcHelper<SFileRecord> {
 	@ResponseBody
 	public String deleteFileByid(HttpServletRequest request,Model model,@PathVariable String id) throws  Exception{
 		String url=API_BASE_URL+URL+"/deletebyid/"+id;
-		return HttpRequestUtils.httpGet(url).toString();
+		return new HttpRequestUtils<String>().httpGet(url).toString();
 	}
 	
 	/**
@@ -251,9 +250,8 @@ public class FileLoadController extends MvcHelper<SFileRecord> {
 	@RequestMapping("/batdelete")
 	@ResponseBody
 	public String batdelete(HttpServletRequest request,Model model,SFileRecord sFileRecord) throws  Exception{
-		JsonParseUtil<SFileRecord> jsonParseUtil=new JsonParseUtil<SFileRecord>();
 		String url=API_BASE_URL+URL+"/batdelete";
-		return HttpRequestUtils.httpPost(url, jsonParseUtil.toJsonObject(sFileRecord)).toString();
+		return new HttpRequestUtils<SFileRecord>().httpPost(url, sFileRecord).toString();
 	}
 	
     /**
@@ -266,7 +264,7 @@ public class FileLoadController extends MvcHelper<SFileRecord> {
     public void download(@PathVariable(value="bus_uuid") String bus_uuid, HttpServletRequest request ,HttpServletResponse response) throws  AppException{
         try{
         	String url=API_BASE_URL+URL+"/getFileInfo/"+bus_uuid;
-    		JSONObject jsonobject= HttpRequestUtils.httpGetReturnObject(url);
+    		JSONObject jsonobject= new HttpRequestUtils<String>().httpGetReturnObject(url);
     		SFileRecord filerecord=(SFileRecord)JSONObject.toBean(jsonobject, SFileRecord.class);
     		
         	if(filerecord!=null){
